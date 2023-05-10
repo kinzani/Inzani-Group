@@ -1,0 +1,24 @@
+#!/bin/bash
+
+cd ~
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+sh Miniconda3-latest-Linux-x86_64.sh
+conda create --name p3 python=3 mscorefonts numpy matplotlib scipy pip #mscorefonts should be installed first since there are issues if it's installed last. It provides HPCs with classic fonts that are normally missing.
+echo 'conda activate p3' >> ~/.bashrc && source ~/.bashrc
+conda install --channel conda-forge pymatgen
+mkdir ~/src && cd ~/src
+git clone https://github.com/utf/materials-toolbox.git && cd materials-toolbox && pip install .
+cd ..
+git clone https://github.com/ajjackson/mctools.git && cd mctools && pip install .
+cd ..
+git clone https://github.com/WMD-group/kgrid.git && cd kgrid && pip install .
+pip install sumo
+
+homeDir=`echo ~`
+scriptDir=`pwd`
+echo '' >> ~/.bashrc
+echo 'export PATH="$PATH:'${scriptDir}'"' >> ~/.bashrc
+echo 'export PATH="$PATH:'${homeDir}'/src/materials-toolbox/matools"' >> ~/.bashrc
+echo 'export PATH="$PATH:'${homeDir}'/src/kgrid/kgrid"' >> ~/.bashrc
+echo 'export PATH="$PATH:'${homeDir}'/src/mctools/mctools"' >> ~/.bashrc
+source ~/.bashrc

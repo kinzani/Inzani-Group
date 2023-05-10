@@ -1,0 +1,35 @@
+#!/bin/bash
+
+#Need to be in directory above KPOINTConvergence - this directory needs KPOINTS, job, INCAR, POSCAR and POTCAR files for this script to run
+
+
+if [ -d KPOINTConvergence ]; then
+	echo "KPOINTConvergence folder already exists."
+else
+	mkdir KPOINTConvergence
+fi
+
+cd KPOINTConvergence
+
+
+kgrid-series ../POSCAR --min 0 | sed '/inf/d' | awk 'NR > 2 && ($2 > 0.15) {print $3,$4,$5}' > kgrids #generates kgrid series for your POSCAR with the minimum N value = 0, then the line with inf kspacing is deleted, and then the top two lines (headings) are removed, and so are any grids with a kspacing value < 0.15 (column 2 -> $2 > 0.15) - only the k grids are saved (columns 3-5). That output is saved to a file called "kgrids"
+
+
+
+while read grid
+do
+        echo "Initiating KPOINTS with grid $grid"
+	label=${grid// /_} #removing spaces from grid to make a valid directory name
+        mkdir k$label
+        cp ../POSCAR ../POTCAR k$label
+        sed s/yyy/1000/g ../INCAR > k$label/INCAR #setting encut as const and max value from encut list
+        sed s/yyy/"$grid"/g ../KPOINTS > k$label/KPOINTS #setting kgrid in KPOINTS
+        sed s/yyy/"kpoints_$label"/g ../job > k$label/job #done to be able to differentiate between jobs
+	
+	echo "Batching job with grid $grid"
+	cd k$label
+	sbatch job
+	cd ..
+	echo
+done < kgrids
+

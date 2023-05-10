@@ -1,0 +1,33 @@
+#!/bin/bash
+
+#Need to be in directory above encutConvergence - this directory needs KPOINTS, job, INCAR, POSCAR and POTCAR files for this script to run
+
+if [ -d encutConvergence ]; then
+	echo "encutConvergence folder  does exist."
+else
+	mkdir encutConvergence
+fi
+
+cd encutConvergence
+
+kgrid-series ../POSCAR --min 0 | sed '/inf/d' | awk 'NR > 2 && ($2 > 0.15) {print $3,$4,$5}' > kgrids #this line is also in the KPOINTSConverge_generic script - this may or may not have been an incredibly lazy fix to a simple problem XD
+
+biggestGrid=$( tail -n 1 kgrids ) # the line above only exists so that I can grab the largest grid that is used for k-point convergence (a smarter idea would've been to just make the one kgrids file and read in from that, but instead we now have a kgrids file in both convergence test directories lol)
+
+for i in `seq 200 50 1000`;
+do
+	echo $i
+	mkdir e$i
+	cp ../POSCAR ../POTCAR ../KPOINTS e$i
+	sed s/yyy/"$i"/g ../INCAR > e$i/INCAR
+	sed s/ZZZ/"17 17 17"/g ../KPOINTS > e$i/KPOINTS #Added specifically for NiO calc
+	sed s/yyy/"encut_$i"/g ../job > e$i/job #done to be able to differentiate between jobs
+done
+
+for i in `seq 200 50 1000`
+do
+	echo $i
+	cd e$i
+	sbatch job
+	cd ..
+done
