@@ -1,0 +1,14 @@
+#!/bin/bash
+
+EXE="/home/d/dcriveanu/VASP/vasp.5.4.4_2019bCompiler/vasp.5.4.4/bin/vasp_gam"
+srun $EXE > vasp_out
+
+while true;
+do
+        sleep 30s
+        if grep -q "Total CPU time used" OUTCAR; then
+                break #if the line above is found, then the calculation as completed and the next calc can be executed
+        else
+                continue
+        fi
+done
