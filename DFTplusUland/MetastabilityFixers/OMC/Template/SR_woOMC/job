@@ -1,0 +1,21 @@
+#!/bin/bash
+
+#SBATCH --job-name=YAG_Ce_SR_U_3_woOMC
+#SBATCH --partition=defq
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=40
+#SBATCH --mem=179G
+#SBATCH --time=24:00:00
+#SBATCH --mail-type=ALL
+#SBATCH --mail-user=rated.beta@gmail.com
+
+module purge
+module load imkl-uoneasy/2020.1.217-iimpi-2020a
+
+EXE="/gpfs01/home/pcydc6/OMC_VASPdir/vasp.5.4.4/bin/vasp_std"
+
+cd $SLURM_SUBMIT_DIR
+export OMP_NUM_THREADS=1
+unset I_MPI_PMI_LIBRARY
+
+mpirun $EXE
