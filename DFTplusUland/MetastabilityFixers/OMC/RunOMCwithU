@@ -1,0 +1,17 @@
+#!/bin/bash
+
+U=4.0
+echo U=$U
+mkdir U_$U
+cd U_$U
+
+for i in {10..16};
+do
+	mkdir OMC$i
+	cd OMC$i
+	cp ../../Template/RunOMCparts1and2 .
+	sed s/zzz/$U/g ../../Template/job > job
+	sbatch job
+	cd ..
+done
+

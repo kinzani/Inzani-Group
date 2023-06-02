@@ -1,0 +1,29 @@
+#!/bin/bash
+
+num=$(python ../../Template/GetOMCnum.py)
+echo $num
+
+U=$(python ../../Template/GetUVal.py)
+echo $U
+
+echo SR_OMC$num
+mkdir SR_OMC
+cd SR_OMC
+cp ../../../Template/SR_OMC/KPOINTS .
+cp ../../../Template/SR_OMC/POSCAR .
+cp ../../../Template/SR_OMC/POTCAR .
+sed -e s/yyy/"$num"/g -e s/zzz/"$U"/g  ../../../Template/SR_OMC/INCAR > INCAR
+../../../ExecuteAndWait
+cd ..
+
+echo SR_woOMC$num
+mkdir SR_woOMC
+cd SR_woOMC
+cp ../../../Template/SR_woOMC/KPOINTS .
+cp ../../../Template/SR_woOMC/POTCAR .
+cp ../SR_OMC/WAVECAR .
+cp ../SR_OMC/CONTCAR .
+mv CONTCAR POSCAR
+sed s/zzz/"$U"/g ../../../Template/SR_woOMC/INCAR > INCAR
+EXE="/home/d/dcriveanu/VASP/vasp.5.4.4_2019bCompiler/vasp.5.4.4/bin/vasp_gam"
+srun $EXE > vasp_out
