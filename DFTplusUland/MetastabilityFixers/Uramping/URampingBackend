@@ -1,0 +1,33 @@
+#!/bin/bash
+
+step=0.1
+maxValU=7.0
+
+lastDir="None" #Need to define this outside the scope of the while loop. This will get updated with the correct value at the end of the while loop below.
+
+while [[ $lastDir != SR$maxValU ]];
+do
+
+	dir=$(python MakeContDir.py -s $step)
+	#This is done to avoid being stuck in an infinite loop if MakeContDir.py fails.
+	if [ -z "$dir" ]; then
+        	echo "Python script failed - U-ramping" | mail -s "" rated.beta@gmail.com
+		break
+	fi
+
+
+	cd $dir
+	#if the OUTCAR file exists, then a calculation has already been run here, and so there has been a failure somewhere
+	if [ -f OUTCAR ]; then
+		echo "OUTCAR file already exists - calculation has already run" | mail -s "" rated.beta@gmail.com
+		break
+	fi
+	echo $dir
+	../ExecuteAndWait
+	../vaspTimings.py
+	echo ""
+	cd ..
+
+	lastDir=$(python GetLatestDirName.py) #Get the directory name of the last created directory.
+done
+
