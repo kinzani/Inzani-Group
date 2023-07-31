@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+import numpy as np
+import os
+from pymatgen.core.structure import Structure
+from matplotlib import pyplot as plt
+#Need to be in directory above ecutTests
+
+
+os.system("kgrid-series POSCAR --min 0 | sed '/inf/d' | awk 'NR > 2 && ($2 > 0.15) {print $2 \",\" $3,$4,$5}' > kgridVals") #creating the kgridVals file - contains k-spacing and kgrid info
+largestEcutoff = 1000
+kgrids=np.loadtxt("kgrids", delimiter=",", dtype=str)
+kgridLabels = [kgrid.replace(" ", "_") for kgrid in kgrids]
+kspacings=np.loadtxt("kgridVals", delimiter=",", usecols=0)
+os.chdir("KPOINTConvergence")
+
+for i in range(len(kgrids)):
+    print(kgrids[i])
+    os.chdir(f"k{kgridLabels[i]}")
+    totalEnergy=float(os.popen(f"grep TOTEN OUTCAR | tail -1 | awk '{{print $5}}'").read().replace("for","").strip("\n")) #sometimes there can be a warning that has an exclamation mark, so I'm prepping for that
+    if(i==0): #only create a new file if the first line is being written
+        mode="w"
+    else: #otherwise append to the existing file
+        mode="a"
+    with open("../kpointResults.csv", mode) as file:
+        file.write(f"{kgrids[i]},{kspacings[i]},{totalEnergy}\n")
+    os.chdir("..")
+
+kgrids, kspacings, energies=np.loadtxt("kpointResults.csv", delimiter=",", dtype=str, unpack=True)
+energies=[float(energy) for energy in energies]
+kspacings=[float(kspacing) for kspacing in kspacings]
+
+tolerance=0.001
+print(f"Tolerance = {tolerance} eV")
+struct=Structure.from_file("../POSCAR")
+numOfAtoms=struct.num_sites
+energiesPerAtom=[energy/numOfAtoms for energy in energies]
+highestEcutoffEnergy=energiesPerAtom[-1]
+diffList = [abs(energy-highestEcutoffEnergy) for energy in energiesPerAtom]
+convergedValueDiff=next(diff for diff in diffList if diff < tolerance)
+print(f"Converged energy diff: {convergedValueDiff}")
+convergedValueIndex = diffList.index(convergedValueDiff)
+convergedValue=kgrids[convergedValueIndex]
+print(f"Converged value: {convergedValue}")
+
+print()
+print("k-point grid | E per atom | Ediff")
+for kgrid, energyPerAtom, energyDiff in zip(kgrids, energiesPerAtom, diffList):
+    print(f"{kgrid} | {energyPerAtom} | {energyDiff}")
+
+

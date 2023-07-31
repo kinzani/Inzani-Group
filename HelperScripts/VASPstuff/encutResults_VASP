@@ -1,0 +1,46 @@
+#!/usr/bin/env python3
+import numpy as np
+import os
+from pymatgen.core.structure import Structure
+from matplotlib import pyplot as plt
+#Need to be in directory above encutConvergence
+
+
+eVvals=list(range(200, 1050, 50))
+os.chdir("encutConvergence")
+
+
+for counter, eVval in enumerate(eVvals):
+    print(eVval)
+    os.chdir(f"e{eVval}")
+    totalEnergy=float(os.popen(f"grep TOTEN OUTCAR | tail -1 | awk '{{print $5}}'").read().replace("for","").strip("\n")) #sometimes there can be a warning that has an exclamation mark, so I'm prepping for that
+    if(counter==0): #only create a new file if the first line is being written
+        mode="w"
+    else: #otherwise append to the existing file
+        mode="a"
+    with open("../encutResults.csv", mode) as file:
+        file.write(f"{eVval},{totalEnergy}\n")
+    os.chdir("..")
+
+encutResults=np.loadtxt("encutResults.csv", delimiter=",").T #transposing to have two arrays, each with their respectective values - ecutwfc and total energies
+ecutoffs, energies = encutResults[0], encutResults[1]
+
+tolerance=0.001
+print(f"Tolerance: {tolerance} eV")
+struct=Structure.from_file("../POSCAR")
+numOfAtoms=struct.num_sites
+energiesPerAtom=[energy/numOfAtoms for energy in energies]
+highestEcutoffEnergy=energiesPerAtom[-1]
+diffList = [abs(energy-highestEcutoffEnergy) for energy in energiesPerAtom]
+convergedValueDiff=next(diff for diff in diffList if diff < tolerance)
+print(convergedValueDiff)
+convergedValueIndex = diffList.index(convergedValueDiff)
+convergedValue=ecutoffs[convergedValueIndex]
+print(f"Converged value: {convergedValue}")
+
+print()
+print("PW Ecutoff | E per atom | Ediff")
+for ecutoff, energyPerAtom, energyDiff in zip(ecutoffs, energiesPerAtom, diffList):
+    print(f"{ecutoff} | {energyPerAtom} | {energyDiff}")
+
+
