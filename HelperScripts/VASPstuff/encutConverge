@@ -20,7 +20,7 @@ do
 	mkdir e$i
 	cp ../POSCAR ../POTCAR ../KPOINTS e$i
 	sed s/yyy/"$i"/g ../INCAR > e$i/INCAR
-	sed s/ZZZ/"17 17 17"/g ../KPOINTS > e$i/KPOINTS #Added specifically for NiO calc
+	sed s/yyy/"$biggestGrid"/g ../KPOINTS > e$i/KPOINTS
 	sed s/yyy/"encut_$i"/g ../job > e$i/job #done to be able to differentiate between jobs
 done
 
