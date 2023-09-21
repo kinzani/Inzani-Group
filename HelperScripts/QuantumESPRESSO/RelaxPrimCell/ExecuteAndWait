@@ -1,0 +1,13 @@
+#!/bin/bash
+
+mpirun pw.x < zzz.in |tee zzz.out
+
+while true;
+do
+        sleep 10s
+        if grep -q "JOB DONE" zzz.out; then
+                break #if the line above is found, then the calculation as completed and the next calc can be executed
+        else
+                continue
+        fi
+done
