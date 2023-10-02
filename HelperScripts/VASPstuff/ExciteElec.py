@@ -6,8 +6,9 @@ import argparse
 parser = argparse.ArgumentParser()
 parser.add_argument("-o", "--outcar", type=str, help="The file path to the OUTCAR of the ground state calculation of your material.")
 args = parser.parse_args()
-
-outcarPath = "OUTCAR" #f"{args.outcar}/OUTCAR"
+if(args.outcar[-1]=="/"):
+    args.outcar = args.outcar[:-1]
+outcarPath = f"{args.outcar}/OUTCAR"
 
 n_bands = int(os.popen(f"grep NBANDS {outcarPath} | awk '{{print $15}}'").read())
 n_k = int(os.popen(f"grep NBANDS {outcarPath} | awk '{{print $4}}'").read())
