@@ -25,7 +25,7 @@ class Analysis:
                     "Cu_or_Ni": Analysis.Ni_or_CuFilter,                       #Saves materials that contain Ni or Cu
                     "BinaryComp": Analysis.BinaryCompoundFilter,               #Saves binary compounds
                     "ContainsMetal": Analysis.ContainsMetalFilter,             #Saves materials that contain metals
-                    "ContainsHalogen": Analysis.ContainsHalogenFilter,         #Saves materials that contain halogens
+
                     "ContainsFBlock": Analysis.ContainsFBlockFilter,           #Saves materials that contain a f-block element
                     "ContainsTM": Analysis.ContainsTransitionMetalFilter,      #Saves materials that contain a transition metal
                     "ContainsCorN": Analysis.ContainsCorNFilter,               #Saves materials that contain C or N
@@ -237,35 +237,7 @@ class Analysis:
                 filteredResults.append(result)
         return filteredResults
     
-    @staticmethod
-    def _containsHalogen(formula):
-        """
-        Returns True if a material contains a halogen, returns False otherwise.
 
-        This is the core function of ContainsHalogenFilter.
-        """
-        elemsInFormula = list(Composition(formula).as_dict().keys())
-        halogens = ["F", "Cl", "Br", "I", "At"]
-        if(set(elemsInFormula) & set(halogens)):
-            return True
-        else:
-            return False
-    
-    @staticmethod
-    def ContainsHalogenFilter(results):
-        """
-        Halogen filter.
-
-        This function only saves materials that contain a halogen.
-
-        This function is dependant on the _containsHalogen function.
-        """
-        filteredResults = []
-        for result in results:
-            formula = result["Reduced Formula"]
-            if(Analysis._containsHalogen(formula)):
-                filteredResults.append(result)
-        return filteredResults
     
     @staticmethod
     def BinaryCompoundFilter(results):
