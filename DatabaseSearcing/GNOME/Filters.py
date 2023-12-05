@@ -25,11 +25,13 @@ class Analysis:
                     "Cu_or_Ni": Analysis.Ni_or_CuFilter,                       #Saves materials that contain Ni or Cu
                     "BinaryComp": Analysis.BinaryCompoundFilter,               #Saves binary compounds
                     "ContainsMetal": Analysis.ContainsMetalFilter,             #Saves materials that contain metals
-
+                    "ContainsHalogen": Analysis.ContainsHalogenFilter,         #Saves materials that contain halogens
                     "ContainsFBlock": Analysis.ContainsFBlockFilter,           #Saves materials that contain a f-block element
+                    "AntiFBlock": Analysis.AntiFBlockFilter,
                     "ContainsTM": Analysis.ContainsTransitionMetalFilter,      #Saves materials that contain a transition metal
                     "ContainsCorN": Analysis.ContainsCorNFilter,               #Saves materials that contain C or N
                     "MXeneRatio": Analysis.CheckMXeneRatioFilter,              #Saves materials that have an MXene ratio (use only after ContainsTM and ContainsCorN) - M(transition metal):X(C or N) - 2:1, 3:2, 4:3, 5:4
+                    "ContainsOxygen": Analysis.ContainsOxygenFilter,
                     "GetStructures": self.GetStructures                        #Acquires the structures for the results for the previous filter
         }
         #########################################################################################################################################################
@@ -78,6 +80,66 @@ class Analysis:
 #   3) All filters have only one positional argument - results. See InorganicFilter and DimensionalityFilter.
 
     @staticmethod
+    def _containsOxygen(formula):
+        """
+        Returns True if a material contains a halogen, returns False otherwise.
+
+        This is the core function of ContainsHalogenFilter.
+        """
+        elemsInFormula = list(Composition(formula).as_dict().keys())
+        halogens = ["F", "Cl", "Br", "I", "At"]
+        if(set(elemsInFormula) & set(halogens)):
+            return True
+        else:
+            return False
+    
+    @staticmethod
+    def ContainsHalogenFilter(results):
+        """
+        Halogen filter.
+
+        This function only saves materials that contain a halogen.
+
+        This function is dependant on the _containsHalogen function.
+        """
+        filteredResults = []
+        for result in results:
+            formula = result["Reduced Formula"]
+            if(Analysis._containsOxygen(formula)):
+                filteredResults.append(result)
+        return filteredResults
+    
+    @staticmethod
+    def _containsOxygen(formula):
+        """
+        Returns True if a material contains oxygen, returns False otherwise.
+
+        This is the core function of ContainsOxygenFilter.
+        """
+        elemsInFormula = list(Composition(formula).as_dict().keys())
+        oxygen = ["O"]
+        if(set(elemsInFormula) & set(oxygen)):
+            return True
+        else:
+            return False
+    
+    @staticmethod
+    def ContainsOxygenFilter(results):
+        """
+        Oxygen filter.
+
+        This function only saves materials that contain oxygen.
+
+        This function is dependant on the _containsOxygen function.
+        """
+        filteredResults = []
+        for result in results:
+            formula = result["Reduced Formula"]
+            if(Analysis._containsOxygen(formula)):
+                filteredResults.append(result)
+        return filteredResults
+
+    @staticmethod
     def _getStructure(result):
         """
         Used to obtain the structure of a material given its ID.
@@ -89,7 +151,9 @@ class Analysis:
         A pymatgen Structure object that you can analyse with Pymatgen.
         """
         id = result["MaterialId"]
-        struct = Structure.from_file(f"by_id/{id}.cif")
+        cwd = os.getcwd()
+        dirAbove = cwd.replace(os.getcwd().split("/")[-1], "")[:-1]
+        struct = Structure.from_file(os.path.join(dirAbove, "by_id", f"{id}.cif"))
         return struct
 
     @staticmethod
@@ -414,7 +478,9 @@ class Analysis:
             os.mkdir(structureDirName)
             for result in results:
                 id = result["MaterialId"]
-                shutil.copy(f"by_id/{id}.cif", structureDirName)
+                cwd = os.getcwd()
+                dirAbove = cwd.replace(os.getcwd().split("/")[-1], "")[:-1]
+                shutil.copy(os.path.join(dirAbove, "by_id", f"{id}.cif"), structureDirName)
 
         return results
 
