@@ -1,3 +1,4 @@
+#! /usr/bin/env python3
 from pymatgen.io.vasp.outputs import Vasprun
 from pymatgen.analysis.phase_diagram import PhaseDiagram, PDPlotter
 from pymatgen.apps.borg.hive import VaspToComputedEntryDrone
