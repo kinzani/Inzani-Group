@@ -4,7 +4,15 @@ from pymatgen.apps.borg.hive import VaspToComputedEntryDrone
 from pymatgen.entries.compatibility import MaterialsProject2020Compatibility
 import os
 from pymatgen.ext.matproj import MPRester
+import argparse
+import warnings
+warnings.filterwarnings("ignore")
 
+parser = argparse.ArgumentParser(prog = 'Phase diagram plotter',
+                    description = 'This program takes a vasprun.xml and adds the result into a phase diagram for the structure used in the original calculation.')
+parser.add_argument("-f", "--file", type=str, default="vasprun.xml", help="Path to a vasprun.xml file.")
+args = parser.parse_args()
+vasprunFile = args.file
 
 def APIkeyChecker():
     APIkey = None #done so that APIkey is not lost in the scope of the with block
@@ -30,7 +38,7 @@ def APIkeyChecker():
             return APIkey
 
 print("Starting vasprun things:")
-vasprunObj = Vasprun("vasprun.xml")
+vasprunObj = Vasprun(vasprunFile)
 elemSymbols = list(dict.fromkeys(vasprunObj.atomic_symbols)) #keeping one of each of the element symbols
 print(f"Elements in material: {elemSymbols}")
 mpr = MPRester(APIkeyChecker())
@@ -54,5 +62,5 @@ else:
     ehull = pd.get_e_above_hull(entries[-1])
     print(f"Energy above hull (corrected) for {entries[-1].composition}: {ehull:.3f} eV/atom")
 
-#plotter = PDPlotter(pd, show_unstable=True)
-#plotter.show()
+plotter = PDPlotter(pd, show_unstable=True)
+plotter.show()
