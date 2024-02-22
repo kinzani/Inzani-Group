@@ -1,6 +1,7 @@
 RotateAtoms.py rotates select atoms around a given axis which is aligned with the z-axis.
 
 usage: RotateAtoms [-h] [-f FILE] [-i INDICES [INDICES ...]] [-p POINT POINT] [-a ANGLE] [-o OUTPUTTYPE]
+Example: ./RotateAtoms.py -f CuIO4.cif -i 4 13 24 -p 0.5 0.5 -a 180  
 
 This program takes a structure file, a list of atom indices (1-indexed), the x and y fractional coords of an axis of rotation (aligned with the z-axis)
 and an angle of rotation in degrees, and rotates the selected atoms around that axis and returns a rotated .cif file.
