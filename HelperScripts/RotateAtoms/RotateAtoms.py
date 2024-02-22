@@ -10,12 +10,12 @@ from pymatgen.io.vasp import Poscar
 
 parser = argparse.ArgumentParser(
                                 prog='RotateAtoms',
-                                description='This program takes a structure file, a list of atom indices (0-indexed), the x and y fractional coords of an axis of rotation (aligned with the z-axis) and an angle of rotation in degrees, and rotates the selected atoms around that axis and returns a rotated .cif file.',
+                                description='This program takes a structure file, a list of atom indices (1-indexed), the x and y fractional coords of an axis of rotation (aligned with the z-axis) and an angle of rotation in degrees, and rotates the selected atoms around that axis and returns a rotated .cif file.',
                                 epilog='Hope this helps!'
                                 )
 
 parser.add_argument("-f", '--file', type=str, default="POSCAR", help="Filepath to structure file.")
-parser.add_argument("-i", '--indices', action='store', type=int, nargs="+", help="List of atom indices (0-indexed) separated by spaces.")
+parser.add_argument("-i", '--indices', action='store', type=int, nargs="+", help="List of atom indices (1-indexed) separated by spaces.")
 parser.add_argument("-p", '--point', action='store', type=float, nargs=2, help="x and y fractional coordinates of the axis of rotation. Coordinates must be passed in separated by spaces")
 parser.add_argument("-a", '--angle', type=float, help="Angle of rotation in degrees.")
 parser.add_argument("-o", '--outputType', type=str, default="cif", help="Output file type - POSCAR or cif. .cif is the default file type.")
@@ -24,6 +24,7 @@ args = parser.parse_args()
 
 struct_file = args.file
 atom_indices = args.indices
+atom_indices = list(np.array(atom_indices)-1) #making indices 0-indexed as python expects
 x_and_y_forAxis = args.point
 angle_of_rot = args.angle
 output_file_type = args.outputType.lower()

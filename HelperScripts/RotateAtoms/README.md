@@ -2,14 +2,14 @@ RotateAtoms.py rotates select atoms around a given axis which is aligned with th
 
 usage: RotateAtoms [-h] [-f FILE] [-i INDICES [INDICES ...]] [-p POINT POINT] [-a ANGLE] [-o OUTPUTTYPE]
 
-This program takes a structure file, a list of atom indices (0-indexed), the x and y fractional coords of an axis of rotation (aligned with the z-axis)
+This program takes a structure file, a list of atom indices (1-indexed), the x and y fractional coords of an axis of rotation (aligned with the z-axis)
 and an angle of rotation in degrees, and rotates the selected atoms around that axis and returns a rotated .cif file.
 
 optional arguments:
   -h, --help            show this help message and exit
   -f FILE, --file FILE  Filepath to structure file.
   -i INDICES [INDICES ...], --indices INDICES [INDICES ...]
-                        List of atom indices (0-indexed) separated by spaces.
+                        List of atom indices (1-indexed) separated by spaces.
   -p POINT POINT, --point POINT POINT
                         x and y fractional coordinates of the axis of rotation. Coordinates must be passed in separated by spaces
   -a ANGLE, --angle ANGLE
