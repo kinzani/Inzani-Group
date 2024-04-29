@@ -40,6 +40,7 @@ def GetMoIandPrincipalAxes(molecule):
         rel_pos = atom[1] - com #centring on centre of mass (com)
         moi_tensor += atom[0] * (np.linalg.norm(rel_pos)**2 * identity - np.outer(rel_pos, rel_pos)) #this seems to be a sneaky way of making the inertia tensor in one go, rather than doing it element by element - check out the definition of the inertia tensor here https://en.wikipedia.org/wiki/Moment_of_inertia#Inertia_tensor
     principal_moi, principal_axes_mat = np.linalg.eigh(moi_tensor)
+    print(f"Principal moments of inertia: {principal_moi}")
     principal_axes = [principal_axes_mat[:, i] for i in range(3)] #transpose the matrix - for reasons beyond my understanding, the eigenvectors seem to come in colummn form, so for python to be able to use an eigenvector, you need to make the column vectors into row vectors (why this isn't done by default is beyond me)
     
     return principal_moi, principal_axes
@@ -143,6 +144,7 @@ def GetRotatedLatticeParams(molecule, latticeParams):
         rel_pos = atom[1] - com #centring on centre of mass (com)
         moi_tensor += atom[0] * (np.linalg.norm(rel_pos)**2 * identity - np.outer(rel_pos, rel_pos)) #this seems to be a sneaky way of making the inertia tensor in one go, rather than doing it element by element - check out the definition of the inertia tensor here https://en.wikipedia.org/wiki/Moment_of_inertia#Inertia_tensor
     principal_moi, principal_axes_mat = np.linalg.eigh(moi_tensor)
+    print(f"Principal moments of inertia: {principal_moi}")
     rotatedLatticeParams = principal_axes_mat@latticeParams #principal axes are column vectors, and lattice params are row vectors
     largestEigValLatticeParams = np.array([rotatedLatticeParams[:,x] for x in cyclicPermutations[0]]).T
     middleEigValLatticeParams = np.array([rotatedLatticeParams[:,x] for x in cyclicPermutations[1]]).T
