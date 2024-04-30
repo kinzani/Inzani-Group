@@ -7,7 +7,7 @@ import argparse
 
 def GetSiteSymmetry(struct, siteIndex, tolerance=0.3):
     mdd = MinimumDistanceNN()
-    bonded_structure = mdd.get_bonded_structure(struct) #make StructureGraph
+    bonded_structure = mdd.get_bonded_structure(struct) #make StructureGraph object
     site_neighbours = bonded_structure.get_connected_sites(siteIndex) #get neighbours of the chosen site
     site_neighbours = [connected_site.site for connected_site in site_neighbours] #acquiring PeriodicSite objects from the ConnectedSite objects that .get_connected_sites returned
     site_polyhedron = site_neighbours+[struct[siteIndex]] #creating the site polyhedron -> neighbours+chosen site
