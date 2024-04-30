@@ -8,10 +8,10 @@ import argparse
 def GetSiteSymmetry(struct, siteIndex, tolerance=0.3):
     mdd = MinimumDistanceNN()
     bonded_structure = mdd.get_bonded_structure(struct) #make StructureGraph
-    site_neighbours = bonded_structure.get_connected_sites(siteIndex)
+    site_neighbours = bonded_structure.get_connected_sites(siteIndex) #get neighbours of the chosen site
     site_neighbours = [connected_site.site for connected_site in site_neighbours] #acquiring PeriodicSite objects from the ConnectedSite objects that .get_connected_sites returned
-    site_polyhedron = site_neighbours+[struct[siteIndex]] #creating an array of Site objects
-    site_polyhedron = Molecule.from_sites(site_polyhedron) #creating a Molecule object from the array of Sites
+    site_polyhedron = site_neighbours+[struct[siteIndex]] #creating the site polyhedron -> neighbours+chosen site
+    site_polyhedron = Molecule.from_sites(site_polyhedron) #creating a Molecule object from the site_polyhedron defined above
     sitePointGroup = PointGroupAnalyzer(site_polyhedron, tolerance).get_pointgroup()
     print(f"Symmetry of {struct[siteIndex].species_string} site in {struct.formula}: {sitePointGroup}")
     return sitePointGroup
