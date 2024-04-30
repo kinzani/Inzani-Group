@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(prog = 'Site symmetry acquirer.',
                     epilog = 'Hope you have fun with this program :)')
 parser.add_argument("-i", "--index", type=int, help="The index of the site whose symmetry will unveiled.")
 parser.add_argument("-f", "--file", type=str, default="POSCAR", help="File that will be used to acquire structure. The default file is POSCAR.")
-parser.add_argument("-t", "--tol", type=float, default="0.3", help="The tolerance for deriving the symmetry of a site. The default value is 0.3.")
+parser.add_argument("-t", "--tol", type=float, default=0.3, help="The tolerance for deriving the symmetry of a site. The default value is 0.3.")
 args = parser.parse_args()
 
 struct = Structure.from_file(args.file)
